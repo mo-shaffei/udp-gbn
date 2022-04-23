@@ -14,7 +14,7 @@ class Receiver:
         self.socket.bind(('', receiver_port))  # bind socket to the receiver port
         self.expectedseqnum = 0
 
-    def receive_gbn(self, filename: str) -> None:
+    def receive_file(self, filename: str) -> None:
         """
         Receive file from sender
         :param filename: name of received file
@@ -60,7 +60,7 @@ class Receiver:
 
 def main():
     receiver = Receiver(max_seg_size=2048)
-    receiver.receive_gbn("Received Files/SmallFile.png")
+    receiver.receive_file("Received Files/SmallFile.png")
     receiver.close_socket()
 
 
