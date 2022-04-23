@@ -45,7 +45,7 @@ class Receiver:
                     break
                 self._expectedseqnum += 1  # increment expectedseqnum
             else:  # received unexpected packet, discard it
-                print("Discarding packet ", packet_id)
+                print(f"Expected packet {self._expectedseqnum} but received {packet_id} and discarding it")
                 self._send_ack(sender_address, file_id)
 
         print("Received all packets")
