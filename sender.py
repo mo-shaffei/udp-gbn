@@ -47,6 +47,7 @@ class Sender:
                 self._nextseqnum += 1  # increment nextseqnum
             else:  # no packets can be transmitted in window
                 self._recv_ack()  # wait for acknowledgement from receiver
+        print("Transmitted all packets!")
 
     def _read_file(self, filename):
         """
@@ -105,7 +106,7 @@ class Sender:
 
 
 def main():
-    sender = Sender(rec_ip='localhost', rec_port=12001, max_seg_size=2048, win_size=4, timeout=1)
+    sender = Sender(rec_ip='localhost', rec_port=12001, max_seg_size=10, win_size=4, timeout=1)
     sender.send_file('Test Files/SmallFile.png')
     sender.close_socket()
 
