@@ -15,10 +15,10 @@ class Sender:
 
         :param rec_ip: ip of the receiver
         :param rec_port: port of the receiver
-        :param max_seg_size: maximum segment size
+        :param max_seg_size: maximum segment size in bytes
         :param sender_port: port to use for the sender
         :param win_size: Go-Back-N window size
-        :param timeout: ACK timeout interval before retransmission
+        :param timeout: ACK timeout interval before retransmission in seconds
         """
         self._rec_ip = rec_ip  # store receiver ip
         self._rec_port = rec_port  # store receiver port

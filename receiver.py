@@ -10,6 +10,12 @@ class Receiver:
     """
 
     def __init__(self, max_seg_size: int, receiver_port: int = 12001, sim_loss_rate: float = 0.15):
+        """
+
+        :param max_seg_size: maximum segment size in bytes
+        :param receiver_port: port to use for the receiver
+        :param sim_loss_rate: simulated packet loss rate in the range (0-1)
+        """
         self._max_seg_size = max_seg_size  # store maximum segment size
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # create UDP socket
         self._socket.bind(('', receiver_port))  # bind socket to the receiver port
