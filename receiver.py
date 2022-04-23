@@ -63,8 +63,9 @@ class Receiver:
 
 
 def main():
-    receiver = Receiver(max_seg_size=2048, sim_loss_rate=0.15)
-    receiver.receive_file("Received Files/LargFile.png")
+    assert len(sys.argv) == 3
+    receiver = Receiver(max_seg_size=2048, sim_loss_rate=float(sys.argv[2]))
+    receiver.receive_file(sys.argv[1])
     receiver.close_socket()
 
 
