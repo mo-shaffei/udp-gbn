@@ -106,8 +106,8 @@ class Sender:
 
 
 def main():
-    sender = Sender(rec_ip='localhost', rec_port=12001, max_seg_size=10, win_size=4, timeout=1)
-    sender.send_file('Test Files/SmallFile.png')
+    sender = Sender(rec_ip='localhost', rec_port=12001, max_seg_size=2048, win_size=4, timeout=1)
+    sender.send_file('Test Files/LargFile.png')
     sender.close_socket()
 
 

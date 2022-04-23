@@ -60,7 +60,7 @@ class Receiver:
 
 def main():
     receiver = Receiver(max_seg_size=2048)
-    receiver.receive_file("Received Files/SmallFile.png")
+    receiver.receive_file("Received Files/LargFile.png")
     receiver.close_socket()
 
 
