@@ -38,7 +38,7 @@ class Receiver:
             file_id = packet[2:4]  # extract file_id from second 16 bits
             if packet_id == self._expectedseqnum:  # if packet id matched expectedseqnum, then accept it
                 print("Received packet ", packet_id)
-                self._send_ack(sender_address, file_id)  # send ACK to sender
+                self._send_ack(self._expectedseqnum, sender_address, file_id)  # send ACK to sender
                 received_data.extend(packet[4:-2])  # extract payload and append it to received_data
                 trailer_bits = packet[-2:]  # extract trailer bits from last 16 bits
                 if trailer_bits.hex() == 'ffff':  # if trailer_bits is 'ffff' then all data is received
@@ -46,21 +46,24 @@ class Receiver:
                 self._expectedseqnum += 1  # increment expectedseqnum
             else:  # received unexpected packet, discard it
                 print(f"Expected packet {self._expectedseqnum} but received {packet_id} and discarding it")
-                self._send_ack(sender_address, file_id)
+                # send ack with last received packet id
+                self._send_ack(self._expectedseqnum - 1, sender_address, file_id)
 
         print("Received all packets")
         with open(filename, 'wb') as file:  # write received data to file
             file.write(received_data)
         print("File written at ", filename)
 
-    def _send_ack(self, sender_address, file_id):
+    def _send_ack(self, packet_id, sender_address, file_id):
         """
         send acknowledgement to sender
         :param sender_address: tuple containing (sender_ip: str, sender_port: int)
         :param file_id: id of current file being transmitted
         :return:
         """
-        packet = self._expectedseqnum.to_bytes(2, sys.byteorder)  # create ack packet and add expectedseqnum to it
+        if packet_id < 0:  # handle loss of first packet to prevent negative acks
+            return
+        packet = packet_id.to_bytes(2, sys.byteorder)  # create ack packet and add expectedseqnum to it
         packet += file_id  # add file id to packet
         self._socket.sendto(packet, sender_address)  # send packet
 
