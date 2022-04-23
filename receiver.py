@@ -1,5 +1,6 @@
 import socket
 import sys
+import random
 
 
 class Receiver:
@@ -8,11 +9,12 @@ class Receiver:
 
     """
 
-    def __init__(self, max_seg_size: int, receiver_port: int = 12001):
+    def __init__(self, max_seg_size: int, receiver_port: int = 12001, sim_loss_rate: float = 0.15):
         self._max_seg_size = max_seg_size  # store maximum segment size
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # create UDP socket
         self._socket.bind(('', receiver_port))  # bind socket to the receiver port
         self._expectedseqnum = 0
+        self.sim_loss_rate = sim_loss_rate
 
     def receive_file(self, filename: str) -> None:
         """
@@ -24,6 +26,8 @@ class Receiver:
         while 1:  # loop until all packets have been received
             # receive a packet, set buffer size to max_seg_size + header size
             packet, sender_address = self._socket.recvfrom(self._max_seg_size + 6)
+            if random.random() <= self.sim_loss_rate:
+                continue
             packet_id = int.from_bytes(packet[:2], sys.byteorder)  # extract packet_id from first 16 bits
             file_id = packet[2:4]  # extract file_id from second 16 bits
             if packet_id == self._expectedseqnum:  # if packet id matched expectedseqnum, then accept it
@@ -59,7 +63,7 @@ class Receiver:
 
 
 def main():
-    receiver = Receiver(max_seg_size=2048)
+    receiver = Receiver(max_seg_size=2048, sim_loss_rate=0.15)
     receiver.receive_file("Received Files/LargFile.png")
     receiver.close_socket()
 
