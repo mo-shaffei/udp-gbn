@@ -1,6 +1,7 @@
 import socket
 import sys
 import random
+from datetime import datetime
 
 
 class Receiver:
@@ -21,6 +22,10 @@ class Receiver:
         self._socket.bind(('', receiver_port))  # bind socket to the receiver port
         self._expectedseqnum = 0
         self.sim_loss_rate = sim_loss_rate
+        self._total_packets = 0
+        self._total_bytes = 0
+        self._trans_begin = 0
+        self._trans_end = 0
 
     def receive_file(self, filename: str) -> None:
         """
@@ -29,9 +34,12 @@ class Receiver:
         :return: None
         """
         received_data = bytearray()  # init received_data to empty bytearray
+        self._trans_begin = datetime.today()
         while 1:  # loop until all packets have been received
             # receive a packet, set buffer size to max_seg_size + header size
             packet, sender_address = self._socket.recvfrom(self._max_seg_size + 6)
+            self._total_packets += 1
+            self._total_bytes += len(packet)
             if random.random() <= self.sim_loss_rate:
                 continue
             packet_id = int.from_bytes(packet[:2], sys.byteorder)  # extract packet_id from first 16 bits
@@ -49,6 +57,7 @@ class Receiver:
                 # send ack with last received packet id
                 self._send_ack(self._expectedseqnum - 1, sender_address, file_id)
 
+        self._trans_end = datetime.today()
         print("Received all packets")
         with open(filename, 'wb') as file:  # write received data to file
             file.write(received_data)
@@ -70,12 +79,30 @@ class Receiver:
     def close_socket(self) -> None:
         self._socket.close()
 
+    def get_stats(self):
+        """
+        Get statistics about the file transfer
+        :return:
+        """
+        stats = dict()
+        stats['start'] = self._trans_begin.strftime('%H:%M:%S')
+        stats['end'] = self._trans_end.strftime('%H:%M:%S')
+        stats['elapsed'] = (self._trans_end - self._trans_begin).seconds
+        stats['packets'] = self._total_packets
+        stats['bytes'] = self._total_bytes
+        stats['avg_packets'] = self._total_packets / stats['elapsed']
+        stats['avg_bytes'] = self._total_bytes / stats['elapsed']
+        return stats
+
 
 def main():
     assert len(sys.argv) == 3
     receiver = Receiver(max_seg_size=2048, sim_loss_rate=float(sys.argv[2]))
     receiver.receive_file(sys.argv[1])
     receiver.close_socket()
+    print(30 * '*' + ' Statistics ' + 30 * '*')
+    print(receiver.get_stats())
+    print(72 * '*')
 
 
 if __name__ == "__main__":
