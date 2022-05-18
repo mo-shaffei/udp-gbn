@@ -4,6 +4,7 @@ import sys
 import signal
 from datetime import datetime
 
+
 class Sender:
     """
     Class to implement a sender using Go-Back-N algorithm on top of UDP to achieve reliable transfer
@@ -136,9 +137,10 @@ def main():
     sender = Sender(rec_ip=sys.argv[2], rec_port=int(sys.argv[3]), max_seg_size=2048, win_size=4, timeout=1)
     sender.send_file(sys.argv[1])
     sender.close_socket()
-    print(30*'*' + ' Statistics ' + 30*'*')
+    print(30 * '*' + ' Statistics ' + 30 * '*')
     print(sender.get_stats())
     print(72 * '*')
+
 
 if __name__ == '__main__':
     main()
