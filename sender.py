@@ -94,7 +94,6 @@ class Sender:
         :return: None
         """
         ack_packet, _ = self._socket.recvfrom(4)  # wait for acknowledgement with buffer 4 bytes(2 packet_id, 2 file_id)
-        print("Received ACK ", int.from_bytes(ack_packet[:2], sys.byteorder))
         self._base = int.from_bytes(ack_packet[:2], sys.byteorder) + 1  # update base to last acknowledged packet id
         if self._base == self._nextseqnum:  # if last packet in window then stop timer
             signal.setitimer(signal.ITIMER_REAL, 0)
