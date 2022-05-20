@@ -35,6 +35,8 @@ class Sender:
         self._total_retrans = 0
         self._trans_begin = 0
         self._trans_end = 0
+        self.history = list()
+        self._step = 0
 
     def send_file(self, filename):
         """
@@ -53,6 +55,7 @@ class Sender:
                     signal.setitimer(signal.ITIMER_REAL, self._timeout)
                 self._nextseqnum += 1  # increment nextseqnum
             else:  # no packets can be transmitted in window
+                self._step += 1
                 self._recv_ack()  # wait for acknowledgement from receiver
         print("Transmitted all packets!")
         self._trans_end = datetime.today()
@@ -75,6 +78,7 @@ class Sender:
         :param packet_id: id of packet to send
         :return: None
         """
+        self.history.append((packet_id, self._step))
         file_id = 0  # set file_id to 0
         current_byte = packet_id * self._max_seg_size  # get first byte to be sent
         trailer = "0000" if current_byte + self._max_seg_size < len(
@@ -107,6 +111,7 @@ class Sender:
         """
         print("Timeout! Retransmitting...")
         signal.setitimer(signal.ITIMER_REAL, self._timeout)  # start a new time
+        self._step += 1
         for packet_id in range(self._base, self._nextseqnum):  # retransmit all packets in window
             self._send_packet(packet_id)
             self._total_retrans += 1
